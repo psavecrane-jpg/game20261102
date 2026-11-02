@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>알쏭달쏭 사자성어</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;color:#243047;background:#eef4ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:linear-gradient(140deg,#eaf3ff,#fff7df)}
+main{width:min(720px,100%);margin:auto;padding:16px}
+header{text-align:center;padding:8px 0 18px}
+h1{font-size:clamp(1.8rem,7vw,3rem);margin:8px 0}
+.sub{color:#637087;margin:0}
+.card{background:#fff;border:1px solid #dfe6f2;border-radius:22px;padding:clamp(16px,4vw,28px);box-shadow:0 10px 28px #263b6312}
+.center{text-align:center}
+.hidden{display:none!important}
+button{font:inherit;font-weight:750;border:0;border-radius:13px;padding:13px 18px;min-height:50px;cursor:pointer;touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:3px solid #f0bd4d;outline-offset:2px}
+.primary{background:#3159a6;color:white}
+.secondary{background:#eaf0ff;color:#3159a6}
+button:disabled{opacity:.55;cursor:not-allowed}
+.full{width:100%;margin-top:12px}
+.stats{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;color:#637087;font-weight:700}
+.pill{border-radius:30px;padding:5px 10px;background:#fff0c9;color:#78520f}
+.progress{height:8px;background:#edf0f6;border-radius:20px;overflow:hidden;margin:14px 0}
+.progress div{height:100%;width:0;background:#3159a6}
+.prompt{text-align:center;font-size:clamp(2.8rem,13vw,5rem);font-weight:900;letter-spacing:.08em;margin:22px 0 12px}
+.blank{display:inline-block;color:#3159a6;border-bottom:4px solid #f0bd4d;min-width:1.15em}
+.hint{background:#f3f6ff;border-radius:14px;padding:14px;line-height:1.65;text-align:center;color:#46536a}
+label{display:block;font-weight:800;margin:18px 0 8px}
+input{width:100%;font:inherit;font-size:1.3rem;text-align:center;padding:13px;border:2px solid #d7deeb;border-radius:13px;min-height:54px}
+.actions{display:flex;gap:10px;margin-top:12px}
+.actions button{flex:1}
+.feedback{min-height:28px;margin-top:14px;font-weight:800;line-height:1.5}
+.good{color:#217a55}.bad{color:#b83c48}
+.meaning{color:#65728a;line-height:1.6;margin-top:6px}
+.bigscore{font-size:clamp(2.5rem,10vw,4rem);font-weight:900;color:#3159a6}
+.review{text-align:left;line-height:1.65;margin:18px 0}
+.review div{border-bottom:1px solid #e6ebf3;padding:10px 0}
+footer{text-align:center;color:#6d788a;font-size:.82rem;line-height:1.6;padding:18px 4px}
+@media(max-width:420px){.actions{flex-direction:column}.prompt{letter-spacing:.03em}}
+@media(orientation:landscape) and (max-height:520px){main{padding:8px 14px}header{padding:0 0 8px}h1{font-size:2rem}.card{padding:14px 20px}.prompt{font-size:2.7rem;margin:8px 0}.hint{padding:8px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>🧩 알쏭달쏭 사자성어</h1>
+<p class="sub">네 글자의 지혜, 두 글자씩 맞혀 보세요!</p>
+</header>
+
+<section id="start" class="card center">
+<div style="font-size:3rem">📚</div>
+<h2>사자성어 퀴즈에 도전하세요!</h2>
+<p>총 10문제입니다. 빈칸에 들어갈 두 글자를 입력하세요.<br>뜻 힌트를 보고 정답을 맞혀 보세요.</p>
+<p><strong>난이도:</strong> 쉬움 4문제 · 보통 3문제 · 어려움 3문제<br><strong>점수:</strong> 정답 1개당 10점</p>
+<button id="startBtn" class="primary full" type="button">게임 시작</button>
+</section>
+
+<section id="game" class="card hidden">
+<div class="stats"><span id="count">문제 1 / 10</span><span id="score">점수 0점</span><span id="level" class="pill">쉬움</span></div>
+<div class="progress"><div id="bar"></div></div>
+<div class="center">
+<p id="direction" class="meaning">앞의 두 글자가 주어졌습니다.</p>
+<div id="prompt" class="prompt">고진<span class="blank">□□</span></div>
+<div class="hint"><strong>뜻 힌트</strong><br><span id="hint"></span></div>
+</div>
+<form id="answerForm" novalidate>
+<label for="answer">빈칸에 들어갈 두 글자를 입력하세요</label>
+<input id="answer" type="text" maxlength="2" autocomplete="off" placeholder="두 글자 입력">
+<div class="actions">
+<button id="checkBtn" class="primary" type="button">정답 확인</button>
+<button id="nextBtn" class="secondary" type="button" disabled>다음 문제</button>
+</div>
+</form>
+<div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+<div id="meaning" class="meaning"></div>
+</section>
+
+<section id="result" class="card center hidden">
+<div id="emoji" style="font-size:3rem">🎉</div>
+<h2>퀴즈 결과</h2>
+<div id="finalScore" class="bigscore">0점 / 100점</div>
+<p id="message"></p>
+<div id="review" class="review"></div>
+<button id="restartBtn" class="primary full" type="button">다시 도전하기</button>
+</section>
+<footer>학습용 사자성어 퀴즈입니다. PC와 스마트폰 화면 크기에 맞춰 표시됩니다.</footer>
+</main>
+<script>
+(function () {
+"use strict";
+var bank = [
+ {word:"고진감래",side:"front",level:"쉬움",hint:"고생 끝에 즐거움이 찾아온다는 뜻입니다.",meaning:"쓴 것이 다하면 단 것이 온다는 뜻으로, 고생 끝에 즐거움이 옴을 이릅니다."},
+ {word:"일석이조",side:"front",level:"쉬움",hint:"한 가지 일로 두 가지 이득을 얻는다는 뜻입니다.",meaning:"돌 하나로 새 두 마리를 잡는다는 뜻입니다."},
+ {word:"동문서답",side:"back",level:"쉬움",hint:"질문과 관계없는 엉뚱한 대답을 하는 것입니다.",meaning:"동쪽을 묻는데 서쪽을 답한다는 뜻입니다."},
+ {word:"전화위복",side:"front",level:"쉬움",hint:"불행한 일이 오히려 좋은 결과로 바뀌는 것입니다.",meaning:"화가 바뀌어 복이 된다는 뜻입니다."},
+ {word:"유비무환",side:"back",level:"보통",hint:"미리 준비해 두면 걱정할 일이 없다는 뜻입니다.",meaning:"준비가 있으면 근심이 없다는 뜻입니다."},
+ {word:"각골난망",side:"front",level:"보통",hint:"입은 은혜가 뼈에 새길 만큼 잊히지 않는다는 뜻입니다.",meaning:"은혜를 깊이 새겨 잊지 못한다는 뜻입니다."},
+ {word:"새옹지마",side:"back",level:"보통",hint:"인생의 길흉화복은 예측하기 어렵다는 뜻입니다.",meaning:"인생의 좋은 일과 나쁜 일은 바뀌어 일어날 수 있음을 이릅니다."},
+ {word:"청출어람",side:"front",level:"어려움",hint:"제자가 스승보다 더 뛰어나게 되는 것을 비유합니다.",meaning:"푸른색은 쪽에서 나왔지만 쪽보다 푸르다는 뜻입니다."},
+ {word:"형설지공",side:"back",level:"어려움",hint:"어려운 환경에서도 부지런히 공부해 이룬 성과입니다.",meaning:"고생하며 공부한 노력을 이르는 말입니다."},
+ {word:"와신상담",side:"front",level:"어려움",hint:"목표를 이루기 위해 괴로움을 참고 견딘다는 뜻입니다.",meaning:"고난을 견디며 원수를 갚거나 목적을 이루려 한다는 뜻입니다."}
+];
+var $ = function(id){ return document.getElementById(id); };
+var deck = [], pos = 0, points = 0, locked = false, history = [];
+function shuffle(items) {
+ var a = items.slice(), i, j, tmp;
+ for (i = a.length - 1; i > 0; i--) {
+  j = Math.floor(Math.random() * (i + 1)); tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+ }
+ return a;
+}
+function show(id) { $(id).classList.remove("hidden"); }
+function hide(id) { $(id).classList.add("hidden"); }
+function startGame() {
+ deck = shuffle(bank); pos = 0; points = 0; locked = false; history = [];
+ hide("start"); hide("result"); show("game"); drawQuestion();
+}
+function drawQuestion() {
+ var q = deck[pos], first = q.word.slice(0,2), last = q.word.slice(2,4);
+ locked = false;
+ $("count").textContent = "문제 " + (pos + 1) + " / 10";
+ $("score").textContent = "점수 " + points + "점";
+ $("level").textContent = q.level;
+ $("bar").style.width = (pos / deck.length * 100) + "%";
+ $("direction").textContent = q.side === "front" ? "앞의 두 글자가 주어졌습니다." : "뒤의 두 글자가 주어졌습니다.";
+ $("prompt").innerHTML = q.side === "front" ? first + '<span class="blank">□□</span>' : '<span class="blank">□□</span>' + last;
+ $("hint").textContent = q.hint;
+ $("answer").value = ""; $("answer").disabled = false;
+ $("checkBtn").disabled = false; $("nextBtn").disabled = true; $("nextBtn").textContent = "다음 문제";
+ $("feedback").textContent = ""; $("feedback").className = "feedback"; $("meaning").textContent = "";
+}
+function checkAnswer() {
+ if (locked) return;
+ var q = deck[pos], answer = $("answer").value.trim().replace(/\s/g,"");
+ if (Array.from(answer).length !== 2) {
+  $("feedback").textContent = "한글 두 글자를 입력해 주세요.";
+  $("feedback").className = "feedback bad";
+  $("answer").focus(); return;
+ }
+ var expected = q.side === "front" ? q.word.slice(2,4) : q.word.slice(0,2);
+ var correct = answer === expected;
+ locked = true;
+ if (correct) points += 10;
+ history.push({q:q, correct:correct});
+ $("score").textContent = "점수 " + points + "점";
+ $("feedback").textContent = correct ? "정답입니다! 참 잘하셨어요. 🎉" : "아쉽습니다. 정답은 ‘" + expected + "’입니다.";
+ $("feedback").className = "feedback " + (correct ? "good" : "bad");
+ $("meaning").textContent = q.word + " — " + q.meaning;
+ $("answer").disabled = true; $("checkBtn").disabled = true; $("nextBtn").disabled = false;
+ $("nextBtn").textContent = pos === deck.length - 1 ? "결과 보기" : "다음 문제";
+ $("bar").style.width = ((pos + 1) / deck.length * 100) + "%";
+}
+function nextQuestion() {
+ if (!locked) return;
+ pos++;
+ if (pos >= deck.length) finishGame(); else drawQuestion();
+}
+function finishGame() {
+ hide("game"); show("result");
+ $("finalScore").textContent = points + "점 / 100점";
+ $("emoji").textContent = points === 100 ? "🏆" : (points >= 70 ? "🎉" : "📖");
+ $("message").textContent = points === 100 ? "완벽합니다! 사자성어 실력이 대단하세요." : (points >= 70 ? "잘하셨습니다! 틀린 문제를 복습해 보세요." : "좋은 출발입니다. 뜻과 함께 다시 익혀 보세요.");
+ var out = "<h3>이번 퀴즈 복습</h3>", i, item;
+ for (i = 0; i < history.length; i++) {
+  item = history[i];
+  out += '<div><strong>' + (i+1) + ". " + item.q.word + " " + (item.correct ? "✅" : "❌") + '</strong><br>' + item.q.meaning + '</div>';
+ }
+ $("review").innerHTML = out;
+}
+$("startBtn").addEventListener("click", startGame);
+$("checkBtn").addEventListener("click", checkAnswer);
+$("answerForm").addEventListener("submit", function(e){ e.preventDefault(); checkAnswer(); });
+$("answer").addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); checkAnswer(); } });
+$("nextBtn").addEventListener("click", nextQuestion);
+$("restartBtn").addEventListener("click", startGame);
+})();
+</script>
+</body>
+</html>
